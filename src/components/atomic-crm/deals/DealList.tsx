@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import type { InputProps } from "ra-core";
 import {
   useCanAccess,
@@ -41,10 +41,12 @@ const DealList = () => {
 
   const dealFilters = [
     <SearchInput source="q" alwaysOn />,
-    <ReferenceInput source="company_id" reference="companies">
+    <ReferenceInput source="company_id" reference="companies" alwaysOn>
       <AutocompleteInput
+        className="min-w-48"
         label={false}
         placeholder={translate("resources.deals.fields.company_id")}
+        emptyText="resources.deals.filters.all_companies"
       />
     </ReferenceInput>,
     <WrapperField source="category" label="resources.deals.fields.category">
@@ -84,6 +86,7 @@ const DealList = () => {
 };
 
 const DealLayout = () => {
+  useResetCompanyFilter();
   const location = useLocation();
   const matchCreate = matchPath("/deals/create", location.pathname);
   const matchShow = matchPath("/deals/:id/show", location.pathname);
@@ -112,6 +115,22 @@ const DealLayout = () => {
       <DealShow open={!!matchShow} id={matchShow?.params.id} />
     </div>
   );
+};
+
+const useResetCompanyFilter = () => {
+  const { filterValues, displayedFilters, setFilters } = useListContext();
+  const initialized = useRef(false);
+
+  useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
+    if (!Object.prototype.hasOwnProperty.call(filterValues, "company_id"))
+      return;
+
+    const remainingFilters = { ...filterValues };
+    delete remainingFilters.company_id;
+    setFilters(remainingFilters, displayedFilters);
+  }, [filterValues, displayedFilters, setFilters]);
 };
 
 const DealActions = () => (
