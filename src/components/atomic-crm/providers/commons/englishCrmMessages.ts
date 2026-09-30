@@ -196,6 +196,7 @@ export const englishCrmMessages = {
         misc: "Misc",
       },
       filters: {
+        all_companies: "All",
         only_mine: "Only deals I manage",
       },
       archived: {

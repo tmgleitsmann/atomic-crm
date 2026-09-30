@@ -200,6 +200,7 @@ export const frenchCrmMessages = {
         misc: "Divers",
       },
       filters: {
+        all_companies: "Toutes",
         only_mine: "Seulement les affaires que je gère",
       },
       archived: {

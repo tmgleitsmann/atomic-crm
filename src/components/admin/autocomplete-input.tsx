@@ -83,6 +83,7 @@ export const AutocompleteInput = (
       className?: string;
       clearable?: boolean;
       disableValue?: string;
+      emptyText?: string;
       filterToQuery?: (searchText: string) => any;
       translateChoice?: boolean;
       placeholder?: string;
@@ -93,6 +94,7 @@ export const AutocompleteInput = (
 ) => {
   const {
     clearable = false,
+    emptyText,
     filterToQuery = DefaultFilterToQuery,
     inputText,
     create,
@@ -120,6 +122,11 @@ export const AutocompleteInput = (
   const accessibleName =
     !hasLabel && props.placeholder ? placeholder : undefined;
   const isClearable = clearable && !isRequired && !!field.value;
+  const showEmptyOption = emptyText !== undefined && !isRequired;
+  const isEmpty = field.value == null || field.value === "";
+  const emptyLabel = showEmptyOption
+    ? translate(emptyText, { _: emptyText })
+    : undefined;
 
   const getRecordRepresentation = useGetRecordRepresentation(resource);
   const { getChoiceText, getChoiceValue } = useChoices({
@@ -234,7 +241,9 @@ export const AutocompleteInput = (
                     isClearable && "pr-9",
                   )}
                 >
-                  {selectedChoice ? (
+                  {showEmptyOption && isEmpty ? (
+                    emptyLabel
+                  ) : selectedChoice ? (
                     getInputText(selectedChoice)
                   ) : (
                     <span className="text-muted-foreground">{placeholder}</span>
@@ -274,6 +283,21 @@ export const AutocompleteInput = (
                 <CommandList ref={listRef}>
                   <CommandEmpty>No matching item found.</CommandEmpty>
                   <CommandGroup>
+                    {showEmptyOption && (
+                      <CommandItem
+                        forceMount
+                        value={`empty-${uniqueId}`}
+                        onSelect={handleReset}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            isEmpty ? "opacity-100" : "opacity-0",
+                          )}
+                        />
+                        {emptyLabel}
+                      </CommandItem>
+                    )}
                     {finalChoices.map((choice) => {
                       const isCreateItem =
                         !!createItem && choice?.id === createItem.id;
